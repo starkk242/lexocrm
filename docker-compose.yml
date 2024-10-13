@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  django:
+    build:
+      context: ./payroll_backend
+    volumes:
+      - ./payroll_backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=1
+      # Add any other environment variables your Django app needs
+
+  react:
+    build:
+      context: ./payroll-frontend
+    volumes:
+      - ./payroll-frontend:/app
+    ports:
+      - "3000:3000"
+
