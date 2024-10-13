@@ -9,7 +9,6 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
   Container,
   IconButton,
   Drawer,
@@ -22,6 +21,44 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import EmployeeForm from './components/EmployeeForm';
 import PayrollForm from './components/PayrollForm';
+
+const styles = {
+  appBar: {
+    backgroundColor: '#2c3e50',
+  },
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '80vh',
+    flexDirection: 'column',
+    textAlign: 'center',
+  },
+  header: {
+    marginBottom: '20px',
+    fontWeight: 'bold',
+    fontSize: '2rem',
+    color: '#34495e',
+  },
+  card: {
+    width: '200px',
+    height: '200px',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '12px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#e8f6f3', // Light teal color
+    textDecoration: 'none',
+    margin: '10px',
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  },
+  typography: {
+    fontWeight: 'bold',
+    fontSize: '1.5rem',
+    color: '#34495e',
+  },
+};
 
 function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -54,7 +91,7 @@ function App() {
   return (
     <Router>
       <CssBaseline />
-      <AppBar position="static">
+      <AppBar position="static" sx={styles.appBar}>
         <Toolbar>
           <IconButton
             edge="start"
@@ -65,14 +102,8 @@ function App() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Payroll Management System
+            LexoCRM
           </Typography>
-          <Button color="inherit" component={Link} to="/employees">
-            Employee Page
-          </Button>
-          <Button color="inherit" component={Link} to="/payroll">
-            Payroll Page
-          </Button>
         </Toolbar>
       </AppBar>
 
@@ -80,18 +111,43 @@ function App() {
         {drawerList}
       </Drawer>
 
-      <Container sx={{ mt: 4 }}>
+      <Container sx={styles.container}>
+        {/* Conditional rendering for the welcome message */}
         <Routes>
-          <Route path="/employees" element={<EmployeeForm />} />
-          <Route path="/payroll" element={<PayrollForm />} />
           <Route
             path="/"
             element={
-              <Typography variant="h4" align="center">
-                Welcome to the Payroll Management System
-              </Typography>
+              <>
+                <Typography sx={styles.header}>Welcome to the LexoCRM - Payroll Managment</Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Link to="/employees" style={{ textDecoration: 'none' }}>
+                    <Box
+                      sx={styles.card}
+                      className="card"
+                    >
+                      <Typography sx={styles.typography}>Employee Page</Typography>
+                    </Box>
+                  </Link>
+                  <Link to="/payroll" style={{ textDecoration: 'none' }}>
+                    <Box
+                      sx={styles.card}
+                      className="card"
+                    >
+                      <Typography sx={styles.typography}>Payroll Page</Typography>
+                    </Box>
+                  </Link>
+                </Box>
+              </>
             }
           />
+          <Route path="/employees" element={<EmployeeForm />} />
+          <Route path="/payroll" element={<PayrollForm />} />
           <Route
             path="*"
             element={

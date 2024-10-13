@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import { TextField, Button, Grid, Box, Typography } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { TextField, Button, Grid, Box, Typography, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 
 const EmployeeForm = () => {
+  const [employees, setEmployees] = useState([]);
   const [employee, setEmployee] = useState({
+    id: null,
     first_name: '',
     last_name: '',
     email: '',
@@ -11,21 +15,59 @@ const EmployeeForm = () => {
     position: '',
   });
 
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = () => {
+    axios.get('http://localhost:8000/api/employees/')
+      .then(response => setEmployees(response.data))
+      .catch(error => console.error('Error fetching employees:', error));
+  };
+
   const handleChange = (e) => {
     setEmployee({ ...employee, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8000/api/employees/', employee)
-      .then(response => console.log(response.data))
-      .catch(error => console.error('Error adding employee:', error));
+    if (employee.id) {
+      // Update existing employee
+      axios.put(`http://localhost:8000/api/employees/${employee.id}/`, employee)
+        .then(response => {
+          fetchEmployees();
+          resetForm();
+        })
+        .catch(error => console.error('Error updating employee:', error));
+    } else {
+      // Create new employee
+      axios.post('http://localhost:8000/api/employees/', employee)
+        .then(response => {
+          fetchEmployees();
+          resetForm();
+        })
+        .catch(error => console.error('Error adding employee:', error));
+    }
+  };
+
+  const resetForm = () => {
+    setEmployee({ id: null, first_name: '', last_name: '', email: '', salary: '', position: '' });
+  };
+
+  const handleEdit = (emp) => {
+    setEmployee(emp);
+  };
+
+  const handleDelete = (id) => {
+    axios.delete(`http://localhost:8000/api/employees/${id}/`)
+      .then(() => fetchEmployees())
+      .catch(error => console.error('Error deleting employee:', error));
   };
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 4 }}>
       <Typography variant="h4" align="center" gutterBottom>
-        Add Employee
+        {employee.id ? 'Edit Employee' : 'Add Employee'}
       </Typography>
       <form onSubmit={handleSubmit}>
         <Grid container spacing={3}>
@@ -83,11 +125,31 @@ const EmployeeForm = () => {
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary" fullWidth>
-              Add Employee
+              {employee.id ? 'Update Employee' : 'Add Employee'}
             </Button>
           </Grid>
         </Grid>
       </form>
+
+      <Typography variant="h6" align="center" sx={{ mt: 4 }}>
+        Employee List
+      </Typography>
+      <List>
+        {employees.map(emp => (
+          <ListItem key={emp.id} secondaryAction={
+            <>
+              <IconButton edge="end" onClick={() => handleEdit(emp)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton edge="end" onClick={() => handleDelete(emp.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </>
+          }>
+            <ListItemText primary={`${emp.first_name} ${emp.last_name}`} secondary={`Email: ${emp.email}, Position: ${emp.position}, Salary: ${emp.salary}`} />
+          </ListItem>
+        ))}
+      </List>
     </Box>
   );
 };

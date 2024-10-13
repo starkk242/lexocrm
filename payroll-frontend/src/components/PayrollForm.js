@@ -67,8 +67,15 @@ function PayrollForm() {
 
   const handleOpenEdit = (payroll) => {
     setSelectedPayroll(payroll);
+    setNewPayroll({
+      employee: payroll.employee.id, // set the selected employee ID
+      total_pay: payroll.total_pay,
+      base_salary: payroll.base_salary,
+      bonus: payroll.bonus,
+      deductions: payroll.deductions,
+    });
     setOpenEdit(true);
-  };
+};
 
   const handleOpenView = (payroll) => {
     setSelectedPayroll(payroll);
@@ -261,6 +268,20 @@ function PayrollForm() {
           >
             <Typography variant="h6">Edit Payroll</Typography>
             <TextField
+              select
+              label="Select Employee"
+              value={newPayroll.employee}
+              onChange={(e) => setNewPayroll({ ...newPayroll, employee: e.target.value })}
+              required
+              sx={{ mb: 2, width: '100%' }}
+            >
+              {employees.map((employee) => (
+                <option key={employee.id} value={employee.id}>
+                  {employee.first_name} {employee.last_name}
+                </option>
+              ))}
+            </TextField>
+            <TextField
               label="Base Salary"
               type="number"
               value={newPayroll.base_salary}
@@ -296,6 +317,7 @@ function PayrollForm() {
           </Box>
         </Fade>
       </Modal>
+
 
       {/* Modal for Adding New Payroll */}
       <Modal
